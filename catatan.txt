@@ -1,0 +1,11 @@
+alamat API url local nya:
+di local laptop: http://localhost:1337/api
+
+https://www.domainesia.com/vps/ ada yang 1 gb
+
+deploy baru bisa ngangkat yang 2gb
+
+https://www.biznetgio.com/pricelist#neo-virtual-compute
+
+api public fic 6:
+103.150.93.77
