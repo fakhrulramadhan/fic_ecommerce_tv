@@ -1,6 +1,8 @@
 alamat API url local nya:
 di local laptop: http://localhost:1337/api
 
+data api local products: http://localhost:1337/api/products
+
 https://www.domainesia.com/vps/ ada yang 1 gb
 
 deploy baru bisa ngangkat yang 2gb
@@ -9,3 +11,24 @@ https://www.biznetgio.com/pricelist#neo-virtual-compute
 
 api public fic 6:
 103.150.93.77
+
+flutter run -d windows -v
+
+urutan pembuatan:
+1. Strapi API
+2. Vps buat deploy API dll (opsional) kalau mau bisa diakses tidak di lokal
+3. UI 
+4. services (data service), atau boleh model dulu
+5. model
+6. blocnya (eventnya dulu, state, baru bloc)
+
+modul auth
+1. buat resposne model
+2. buat data source
+3. buat UI (modul auth)
+
+lain kali kalau mau bikin model, langsung aja copas json api nya ke
+quicktype
+
+yang register jangan pakai generate bloc biasa
+soalnya pakai freezed
