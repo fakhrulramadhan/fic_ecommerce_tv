@@ -32,3 +32,11 @@ quicktype
 
 yang register jangan pakai generate bloc biasa
 soalnya pakai freezed
+
+flutter pub run build_runner watch --delete-conflicting-outputs
+
+flutter pub run build_runner build 
+
+data nya taruh di branch development
+
+akses ke login / register formnya pas sudah tekan tombol checkout

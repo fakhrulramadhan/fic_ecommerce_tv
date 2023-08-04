@@ -30,6 +30,17 @@ class AuthLocalDataSource {
     return authData.jwt; //ambil token jwt (json web token) nya
   }
 
+  //returnnya berupa model
+  Future<AuthResponseModel> getAuthData() async {
+    final SharedPreferences pref = await SharedPreferences.getInstance();
+
+    //ambil data dari auth
+    final authJson = pref.getString('auth') ?? '';
+    final authData = AuthResponseModel.fromJson(jsonDecode(authJson));
+
+    return authData;
+  }
+
   //mendapatkan data user
   Future<User> getUser() async {
     final SharedPreferences pref = await SharedPreferences.getInstance();
@@ -40,11 +51,20 @@ class AuthLocalDataSource {
     return authData.user; //menampilkan data user
   }
 
+  //yang dambil user idnya aja
+  Future<int> getUserId() async {
+    final SharedPreferences pref = await SharedPreferences.getInstance();
+    final authJson = pref.getString('auth') ?? '';
+
+    final authData = AuthResponseModel.fromJson(jsonDecode(authJson));
+
+    return authData.user.id;
+  }
+
   Future<bool> isLogin() async {
     final SharedPreferences pref = await SharedPreferences.getInstance();
 
-    final authJson = pref.getString('auth') ?? '';
-    final authData = AuthResponseModel.fromJson(jsonDecode(authJson));
+    final authJson = pref.getString('auth');
 
     return authJson != null; //kalau jsonnya tidak kosong
   }

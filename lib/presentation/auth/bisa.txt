@@ -82,85 +82,64 @@ class authPageState extends State<AuthPage> {
                   padding: const EdgeInsets.all(8),
                   color: GlobalVariables.backgroundColor,
                   child: Form(
-                    key: _signUpFormKey, //key utk form
+                    key: _signUpFormKey,
                     child: Column(
                       children: [
                         CustomTextField(
-                            controller: _nameController,
-                            hintText: "Nama",
-                            maxLines: 1),
+                          controller: _nameController,
+                          hintText: 'Name',
+                        ),
+                        const SizedBox(height: 10),
                         CustomTextField(
-                          hintText: "Email",
-                          maxLines: 1,
                           controller: _emailController,
+                          hintText: 'Email',
                         ),
+                        const SizedBox(height: 10),
                         CustomTextField(
-                            controller: _passwordController,
-                            hintText: "Password",
-                            maxLines: 1),
-                        const SizedBox(
-                          height: 10.0,
+                          controller: _passwordController,
+                          hintText: 'Password',
                         ),
-                        //pakai bloc counsumer (ada opsi listener, loaded, dan builder)
-                        //bbuat register bloc dan login bloc dulu
+                        const SizedBox(height: 10),
                         BlocConsumer<RegisterBloc, RegisterState>(
                           listener: (context, state) {
-                            // TODO: implement listener
-                            //pakai maybe wher utk menampilkan semua opsi
-                            // yang terjadi pada state
                             state.maybeWhen(
                               orElse: () {},
                               error: () {
-                                //kondisi kalau error akan menampilkan pesan error
-                                ScaffoldMessenger.of(context)
-                                    .showSnackBar(const SnackBar(
-                                  content: Text(
-                                    "Semua Field wajib diisi",
-                                    style: TextStyle(
-                                      fontSize: 15.0,
-                                      fontWeight: FontWeight.w400,
-                                      color: Colors.white,
-                                    ),
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text('Register Error'),
+                                    backgroundColor: Colors.red,
                                   ),
-                                  backgroundColor: Colors.red,
-                                ));
+                                );
                               },
                               loaded: (model) async {
-                                //kalau daftar, di save dulu data user barunya
                                 await AuthLocalDataSource().saveAuthData(model);
-
-                                //arahkan ke homepage (beranda toko), langsung
-                                //pakai => aja
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (context) => const HomePage()),
+                                    builder: (context) {
+                                      return const HomePage();
+                                    },
+                                  ),
                                 );
                               },
                             );
                           },
-                          //utk meemasuukan suatu kondisi di dalam button register
-                          //builder, utk menampilkan UInya (based Login Bloc)
                           builder: (context, state) {
                             return state.maybeWhen(
                               orElse: () {
                                 return CustomButton(
-                                  text: "SignUp",
+                                  text: 'Sign Up',
                                   onTap: () {
-                                    //await data source nya pas loaded
-                                    //jika isiannya tervalidasi semua, maka
-                                    //panggil fungsi register event di register bloc
-                                    //name sama username pakai textcont sama
                                     if (_signUpFormKey.currentState!
                                         .validate()) {
                                       final requestModel = RegisterRequestModel(
-                                          name: _nameController.text,
-                                          password: _passwordController.text,
-                                          email: _emailController.text,
-                                          username: _nameController.text);
+                                        name: _nameController.text,
+                                        password: _passwordController.text,
+                                        email: _emailController.text,
+                                        username: _nameController.text,
+                                      );
 
-                                      //add diisi oleh naam eventnya /
-                                      //nama blocnya
                                       context.read<RegisterBloc>().add(
                                           RegisterEvent.register(requestModel));
                                     }
@@ -168,8 +147,7 @@ class authPageState extends State<AuthPage> {
                                 );
                               },
                               loading: () => const Center(
-                                child: CircularProgressIndicator(),
-                              ),
+                                  child: CircularProgressIndicator()),
                             );
                           },
                         )
@@ -209,93 +187,104 @@ class authPageState extends State<AuthPage> {
                   padding: const EdgeInsets.all(10),
                   color: GlobalVariables.backgroundColor,
                   child: Form(
-                      key: _signInFormKey, //harus pakai key form :D
                       child: Column(
-                        children: [
-                          CustomTextField(
-                              controller: _emailController,
-                              hintText: "Email",
-                              maxLines: 1),
-                          const SizedBox(
-                            height: 12.0,
-                          ),
-                          CustomTextField(
-                              controller: _passwordController,
-                              hintText: "Password",
-                              maxLines: 1),
+                    children: [
+                      CustomTextField(
+                          controller: _emailController,
+                          hintText: "Email",
+                          maxLines: 1),
+                      CustomTextField(
+                          controller: _passwordController,
+                          hintText: "Password",
+                          maxLines: 1),
 
-                          const SizedBox(
-                            height: 8.0,
-                          ),
-                          //button untuk login, pakainya loginbloc
-                          BlocConsumer<LoginBloc, LoginState>(
-                            //listener = lakukan sesuatu pada saat state tertentu
-                            listener: (context, state) async {
-                              // TODO: implement listener
+                      const SizedBox(
+                        height: 8.0,
+                      ),
+                      //button untuk login, pakainya loginbloc
+                      BlocConsumer<LoginBloc, LoginState>(
+                        //listener = lakukan sesuatu pada saat state tertentu
+                        listener: (context, state) async {
+                          // TODO: implement listener
 
-                              //state ketikA loginnya termuat, maka
-                              //simpan data user di local (shared pref)
-                              if (state is LoginLoaded) {
-                                await AuthLocalDataSource()
-                                    .saveAuthData(state.model);
+                          //state ketikA loginnya termuat, maka
+                          //simpan data user di local (shared pref)
+                          if (state is LoginLoaded) {
+                            await AuthLocalDataSource()
+                                .saveAuthData(state.model);
 
-                                //kemudian arahkan ke homepage
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => const HomePage()),
+                            //kemudian arahkan ke homepage
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const HomePage()),
+                            );
+                          }
+
+                          //jika state dalam kondisi error
+                          if (state is LoginError) {
+                            ScaffoldMessenger.of(context)
+                                .showSnackBar(const SnackBar(
+                              content: Text(
+                                "Anda tidak dapat login, data login tidak sesuai",
+                                style: TextStyle(
+                                  fontSize: 16.0,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ));
+                          }
+                        },
+                        //builder, utk menampilkan UInya (based Login Bloc)
+                        builder: (context, state) {
+                          //jika statenya loading
+                          if (state is LoginLoading) {
+                            return const Center(
+                              child: CircularProgressIndicator(),
+                            );
+                          }
+
+                          return CustomButton(
+                            text: 'Sign In',
+                            onTap: () {
+                              if (_signInFormKey.currentState!.validate()) {
+                                final model = LoginRequestModel(
+                                  identifier: _emailController.text,
+                                  password: _passwordController.text,
                                 );
-                              }
-
-                              //jika state dalam kondisi error
-                              if (state is LoginError) {
-                                ScaffoldMessenger.of(context)
-                                    .showSnackBar(const SnackBar(
-                                  content: Text(
-                                    "Anda tidak dapat login, data login tidak sesuai",
-                                    style: TextStyle(
-                                      fontSize: 16.0,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ));
+                                context
+                                    .read<LoginBloc>()
+                                    .add(DoLoginEvent(model: model));
                               }
                             },
-                            //builder, utk menampilkan UInya (based Login Bloc)
-                            builder: (context, state) {
-                              //jika statenya loading
-                              if (state is LoginLoading) {
-                                return const Center(
-                                  child: CircularProgressIndicator(),
-                                );
-                              }
-                              return CustomButton(
-                                text: "Sign In",
-                                onTap: () async {
-                                  //jika isiaannya tervalidasi semua
-                                  if (_signInFormKey.currentState!.validate()) {
-                                    //request model (data dari inputan)
-                                    final requestModel = LoginRequestModel(
-                                        //identifiernya dari email
-                                        identifier: _emailController.text,
-                                        password: _passwordController.text);
+                          );
+                          // return CustomButton(
+                          //   text: "Sign In",
+                          //   onTap: () async {
+                          //     //jika isiaannya tervalidasi semua
+                          //     if (_signInFormKey.currentState!.validate()) {
+                          //       //request model (data dari inputan)
+                          //       final requestModel = LoginRequestModel(
+                          //           //identifiernya dari email
+                          //           identifier: _emailController.text,
+                          //           password: _passwordController.text);
 
-                                    //panggil fungsi login (login bloc), a
-                                    //add nya dari nama event
+                          //       //panggil fungsi login (login bloc), a
+                          //       //add nya dari nama event
 
-                                    print(_emailController.text);
-                                    print(_passwordController.text);
+                          //       print(_emailController.text);
+                          //       print(_passwordController.text);
 
-                                    context
-                                        .read<LoginBloc>()
-                                        .add(DoLoginEvent(model: requestModel));
-                                  }
-                                },
-                              );
-                            },
-                          )
-                        ],
-                      )),
+                          //       context
+                          //           .read<LoginBloc>()
+                          //           .add(DoLoginEvent(model: requestModel));
+                          //     }
+                          //   },
+                          // );
+                        },
+                      )
+                    ],
+                  )),
                 ),
               //  =============================
               // CASE KALAU LOGINNYA SEBAGAI TAMUU (GUEST)

@@ -1,128 +1,143 @@
 import 'package:fic_ecommerce_tv/bloc/checkout/checkout_bloc.dart';
 import 'package:fic_ecommerce_tv/common/global_variable.dart';
-import 'package:fic_ecommerce_tv/presentation/account/account_page.dart';
 import 'package:fic_ecommerce_tv/presentation/cart/cart_page.dart';
-import 'package:fic_ecommerce_tv/presentation/home/widgets/banner_widget.dart';
-import 'package:fic_ecommerce_tv/presentation/home/widgets/list_category_widget.dart';
-import 'package:fic_ecommerce_tv/presentation/home/widgets/list_product_widget.dart';
-import 'package:fic_ecommerce_tv/presentation/search/search_page.dart';
+import 'package:fic_ecommerce_tv/presentation/home/home_page.dart';
 import 'package:flutter/material.dart';
-import 'package:badges/badges.dart' as badges;
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:fic_ecommerce_tv/bloc/list_order/list_order_bloc.dart';
+import 'package:fic_ecommerce_tv/data/datasources/auth_local_datasource.dart';
 
-class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+import 'package:badges/badges.dart' as badges;
+
+import '../../data/models/responses/auth_response_model.dart';
+
+class AccountPage extends StatefulWidget {
+  const AccountPage({super.key});
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  State<AccountPage> createState() => _AccountPageState();
 }
 
-class _HomePageState extends State<HomePage> {
-  final searchController = TextEditingController();
-  final int _page = 0;
-  double bottomBarWidth = 42;
-  double bottomBarBorderWidth = 5;
+class _AccountPageState extends State<AccountPage> {
+  final int _page = 1;
+  double widthBottomBar = 40;
+  double borderWidthBottomBar = 2;
+  User? user;
+
+  //ketika halaman dibuka, pertama kali load dulu data order barang
+  //yang dipesan dan data user
+  @override
+  void initState() {
+    super.initState();
+
+    //blm dibuat list order blocnya :D
+    context.read<ListOrderBloc>().add(const ListOrderEvent.get());
+    getUser();
+  }
+
+  Future<void> getUser() async {
+    await AuthLocalDataSource().getUser();
+    setState(() {}); //update UI
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(60),
+        preferredSize: const Size.fromHeight(50), //tinggi appbar 50
         child: AppBar(
           automaticallyImplyLeading: false,
+          //kasih background merah pada appbar
           flexibleSpace: Container(
-            decoration: const BoxDecoration(color: Color(0xffEE4D2D)),
+            decoration: const BoxDecoration(color: Colors.redAccent),
           ),
-          title: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: Container(
-                  height: 42,
-                  margin: const EdgeInsets.symmetric(horizontal: 16),
-                  child: Material(
-                    borderRadius: BorderRadius.circular(10),
-                    elevation: 3,
-                    child: TextFormField(
-                      onFieldSubmitted: (_) {},
-                      decoration: InputDecoration(
-                        prefixIcon: InkWell(
-                          onTap: () {
-                            SearchPage(search: searchController.text);
-                          },
-                          child: const Padding(
-                            padding: EdgeInsets.only(
-                              left: 6,
-                            ),
-                            child: Icon(
-                              Icons.search,
-                              color: Colors.black,
-                              size: 23,
-                            ),
-                          ),
-                        ),
-                        filled: true,
-                        fillColor: Colors.white,
-                        contentPadding: const EdgeInsets.only(top: 10),
-                        border: const OutlineInputBorder(
-                          borderRadius: BorderRadius.all(
-                            Radius.circular(7),
-                          ),
-                          borderSide: BorderSide.none,
-                        ),
-                        enabledBorder: const OutlineInputBorder(
-                          borderRadius: BorderRadius.all(
-                            Radius.circular(7),
-                          ),
-                          borderSide: BorderSide(
-                            color: Colors.black38,
-                            width: 1,
-                          ),
-                        ),
-                        hintText: 'Search ',
-                        hintStyle: const TextStyle(
-                          fontWeight: FontWeight.w500,
-                          fontSize: 17,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-      body: const Column(
-        crossAxisAlignment: CrossAxisAlignment.start, //orientasi row di kiri
-        children: [
-          SizedBox(
-            height: 16.0,
-          ),
-          ListCategoryWidget(),
-          SizedBox(
-            height: 6.0,
-          ),
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 20),
-            child: BannerWidget(),
-          ),
-          SizedBox(
-            height: 8.0,
-          ),
-          Padding(
-            padding: EdgeInsets.only(left: 10),
-            child: Text(
-              "List Product",
-              style: TextStyle(fontSize: 17, fontWeight: FontWeight.normal),
+          title: const Text(
+            "Account",
+            style: TextStyle(
+              fontSize: 17.0,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
             ),
           ),
-          SizedBox(
-            height: 8,
+          actions: const [],
+        ),
+      ),
+      body: Column(
+        children: [
+          //menampilkan informasi user yang login
+          Text(
+            "User anda: ${user == null ? '--' : user!.username} ",
+            style: const TextStyle(
+              fontSize: 17.0,
+            ),
           ),
-          //karena tingginya overflow melebihi layar => expanded
-          Expanded(child: ListProductWidget())
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blueGrey,
+                  ),
+                  onPressed: () async {
+                    await AuthLocalDataSource().removeAuthData();
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const HomePage()),
+                    );
+                  },
+                  child: const Text("Logout"),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(
+            height: 18.0,
+          ),
+          //garis pembatas
+          const Divider(
+            height: 2,
+            thickness: 3,
+          ),
+          //tampilkan data daftar orderan yang pernah dipesan
+          // per usernya pakai listview dan listorderbloc
+          Expanded(child: BlocBuilder<ListOrderBloc, ListOrderState>(
+            builder: (context, state) {
+              return state.maybeWhen(
+                orElse: () {
+                  return Container(
+                    child: const Center(child: Text("Tidak ada order")),
+                  );
+                },
+
+                //dalam keadaan termuat
+                loaded: (data) {
+                  return ListView.builder(
+                    itemCount: data.data!.length,
+                    physics: const ScrollPhysics(),
+                    itemBuilder: (BuildContext context, int index) {
+                      //index utk tampilkan per data (nomor) order
+                      final orderListData = data.data![index];
+                      return Card(
+                        elevation: 6,
+                        shadowColor: Colors.redAccent,
+                        child: ListTile(
+                          title: Text("No. Order: ${orderListData.id}"),
+                          subtitle: Text(
+                              "Total harga: ${orderListData.attributes!.totalPrice}"),
+                        ),
+                      );
+                    },
+                  );
+                },
+              );
+            },
+          ))
         ],
       ),
+
+      //menu bottom bar
       bottomNavigationBar: BottomNavigationBar(
           currentIndex: 0,
           selectedItemColor: GlobalVariables.selectedNavBarColor,
@@ -134,14 +149,14 @@ class _HomePageState extends State<HomePage> {
           items: [
             BottomNavigationBarItem(
                 icon: Container(
-                  width: bottomBarWidth,
+                  width: widthBottomBar,
                   decoration: BoxDecoration(
                       border: Border(
                     top: BorderSide(
                         color: _page == 0
                             ? GlobalVariables.selectedNavBarColor
                             : GlobalVariables.backgroundColor,
-                        width: bottomBarBorderWidth),
+                        width: borderWidthBottomBar),
                   )),
                   child: InkWell(
                     onTap: () {},
@@ -154,14 +169,14 @@ class _HomePageState extends State<HomePage> {
                 label: ''),
             BottomNavigationBarItem(
                 icon: Container(
-                  width: bottomBarWidth,
+                  width: widthBottomBar,
                   decoration: BoxDecoration(
                       border: Border(
                           top: BorderSide(
                               color: _page == 1
                                   ? GlobalVariables.selectedNavBarColor
                                   : GlobalVariables.unselectedNavBarColor,
-                              width: bottomBarBorderWidth))),
+                              width: borderWidthBottomBar))),
                   child: InkWell(
                     onTap: () {
                       Navigator.push(
@@ -179,7 +194,7 @@ class _HomePageState extends State<HomePage> {
                 label: ''),
             BottomNavigationBarItem(
                 icon: Container(
-                    width: bottomBarWidth,
+                    width: widthBottomBar,
                     decoration: BoxDecoration(
                         border: Border(
                             //kasih garis border atas
@@ -187,7 +202,7 @@ class _HomePageState extends State<HomePage> {
                                 color: _page == 2
                                     ? GlobalVariables.selectedNavBarColor
                                     : GlobalVariables.unselectedNavBarColor,
-                                width: bottomBarBorderWidth))),
+                                width: borderWidthBottomBar))),
                     child: BlocBuilder<CheckoutBloc, CheckoutState>(
                       builder: (context, state) {
                         if (state is CheckoutLoaded) {

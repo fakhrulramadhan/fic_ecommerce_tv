@@ -1,5 +1,6 @@
 import 'package:fic_ecommerce_tv/bloc/checkout/checkout_bloc.dart';
 import 'package:fic_ecommerce_tv/bloc/get_products/get_products_bloc.dart';
+import 'package:fic_ecommerce_tv/presentation/detail_product/detail_product_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -62,131 +63,142 @@ class _ListProductWidgetState extends State<ListProductWidget> {
               // ada index)
               final product = state.data.data![index];
 
-              return Container(
-                color: Colors.white,
-                child: Column(
-                  children: [
-                    Hero(
-                      //pakai a
-                      tag: '${product.attributes!.image}',
-                      // child: Image.asset(
-                      //   "assets/images/img6.png",
-                      //   width: 120.0,
-                      //   height: 120.0,
-                      //   fit: BoxFit.fill,
-                      // ),
-                      child: Image.network(
-                        "${product.attributes!.image}",
-                        width: 100.0,
-                        height: 100.0,
-                        fit: BoxFit.cover,
+              return GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => DetailProductPage(
+                              product: product,
+                            )),
+                  );
+                },
+                child: Container(
+                  color: Colors.white,
+                  child: Column(
+                    children: [
+                      Hero(
+                        //pakai a
+                        tag: '${product.attributes!.image}',
+                        // child: Image.asset(
+                        //   "assets/images/img6.png",
+                        //   width: 120.0,
+                        //   height: 120.0,
+                        //   fit: BoxFit.fill,
+                        // ),
+                        child: Image.network(
+                          "${product.attributes!.image}",
+                          width: 100.0,
+                          height: 100.0,
+                          fit: BoxFit.cover,
+                        ),
                       ),
-                    ),
-                    Text(
-                      "${product.attributes!.price}",
-                      style: const TextStyle(
-                          color: Colors.red,
-                          fontSize: 19,
-                          fontWeight: FontWeight.w500),
-                    ),
-                    Text(
-                      "${product.attributes!.name}",
-                      style: const TextStyle(
-                        fontSize: 17.0,
-                        fontWeight: FontWeight.bold,
+                      Text(
+                        "${product.attributes!.price}",
+                        style: const TextStyle(
+                            color: Colors.red,
+                            fontSize: 19,
+                            fontWeight: FontWeight.w500),
                       ),
-                    ),
-                    //attributes & quantity harus ada
-                    Text(
-                      product.attributes!.quantity! > 0
-                          ? "In Stock"
-                          : "Out Of Stock",
-                      style: TextStyle(
-                        fontSize: 17.0,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.blue.shade200,
+                      Text(
+                        "${product.attributes!.name}",
+                        style: const TextStyle(
+                          fontSize: 17.0,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                    ),
-                    const SizedBox(
-                      height: 8.0,
-                    ),
-                    const Divider(
-                      color: Colors.grey,
-                      height: 3,
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(
-                          Icons.shopping_cart,
-                          size: 24.0,
+                      //attributes & quantity harus ada
+                      Text(
+                        product.attributes!.quantity! > 0
+                            ? "In Stock"
+                            : "Out Of Stock",
+                        style: TextStyle(
+                          fontSize: 17.0,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.blue.shade200,
                         ),
-                        const SizedBox(
-                          width: 4.0,
-                        ),
-                        const Text(
-                          "Beli",
-                          style: TextStyle(
-                            fontSize: 12.0,
-                          ),
-                        ),
-                        const SizedBox(
-                          width: 4.0,
-                        ),
-                        InkWell(
-                          onTap: () {
-                            context
-                                .read<CheckoutBloc>()
-                                .add(RemoveFromCartEvent(product: product));
-                          },
-                          child: const Icon(
-                            Icons.remove_circle,
+                      ),
+                      const SizedBox(
+                        height: 8.0,
+                      ),
+                      const Divider(
+                        color: Colors.grey,
+                        height: 3,
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(
+                            Icons.shopping_cart,
                             size: 24.0,
                           ),
-                        ),
-                        const SizedBox(
-                          width: 4.0,
-                        ),
-                        //agar angka qrynya dinamis, pakai blobuilder
-                        BlocBuilder<CheckoutBloc, CheckoutState>(
-                            builder: (context, state) {
-                          //ketika tombol tambah dan kurang diklik
-                          //jumlah barangnya per masing2 produk
-                          if (state is CheckoutLoaded) {
-                            final countItem = state.items
-                                .where((element) => element.id == product.id)
-                                .length;
-
-                            return Text("$countItem");
-                          }
-                          return const Text(
-                            "0",
+                          const SizedBox(
+                            width: 4.0,
+                          ),
+                          const Text(
+                            "Beli",
                             style: TextStyle(
                               fontSize: 12.0,
                             ),
-                          );
-                        }),
-                        const SizedBox(
-                          width: 4.0,
-                        ),
-                        InkWell(
-                          onTap: () {
-                            //kalau stoknya kosong, barangnya enggak bisa
-                            //ditambah
-                            product.attributes!.quantity! > 0
-                                ? context
-                                    .read<CheckoutBloc>()
-                                    .add(AddToCartEvent(product: product))
-                                : null;
-                          },
-                          child: const Icon(
-                            Icons.add_circle,
-                            size: 24.0,
                           ),
-                        ),
-                      ],
-                    ),
-                  ],
+                          const SizedBox(
+                            width: 4.0,
+                          ),
+                          InkWell(
+                            onTap: () {
+                              context
+                                  .read<CheckoutBloc>()
+                                  .add(RemoveFromCartEvent(product: product));
+                            },
+                            child: const Icon(
+                              Icons.remove_circle,
+                              size: 24.0,
+                            ),
+                          ),
+                          const SizedBox(
+                            width: 4.0,
+                          ),
+                          //agar angka qrynya dinamis, pakai blobuilder
+                          BlocBuilder<CheckoutBloc, CheckoutState>(
+                              builder: (context, state) {
+                            //ketika tombol tambah dan kurang diklik
+                            //jumlah barangnya per masing2 produk
+                            if (state is CheckoutLoaded) {
+                              final countItem = state.items
+                                  .where((element) => element.id == product.id)
+                                  .length;
+
+                              return Text("$countItem");
+                            }
+                            return const Text(
+                              "0",
+                              style: TextStyle(
+                                fontSize: 12.0,
+                              ),
+                            );
+                          }),
+                          const SizedBox(
+                            width: 4.0,
+                          ),
+                          InkWell(
+                            onTap: () {
+                              //kalau stoknya kosong, barangnya enggak bisa
+                              //ditambah
+                              product.attributes!.quantity! > 0
+                                  ? context
+                                      .read<CheckoutBloc>()
+                                      .add(AddToCartEvent(product: product))
+                                  : null;
+                            },
+                            child: const Icon(
+                              Icons.add_circle,
+                              size: 24.0,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               );
             },

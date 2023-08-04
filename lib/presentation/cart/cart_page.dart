@@ -2,6 +2,10 @@
 
 import 'package:fic_ecommerce_tv/bloc/checkout/checkout_bloc.dart';
 import 'package:fic_ecommerce_tv/common/global_variable.dart';
+import 'package:fic_ecommerce_tv/data/datasources/auth_local_datasource.dart';
+import 'package:fic_ecommerce_tv/presentation/account/account_page.dart';
+import 'package:fic_ecommerce_tv/presentation/auth/auth_page.dart';
+import 'package:fic_ecommerce_tv/presentation/checkout/checkout_page.dart';
 import 'package:fic_ecommerce_tv/presentation/home/home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -143,7 +147,21 @@ class _CartPageState extends State<CartPage> {
 
             //butuh auth data source dan auth model, entar aja
             child: ElevatedButton(
-              onPressed: () async {},
+              onPressed: () async {
+                //panggil authlocal login
+                final isLogin = await AuthLocalDataSource().isLogin();
+
+                //jika datanya cocok, ke checkout page
+                if (isLogin) {
+                  Navigator.push(context, MaterialPageRoute(builder: (context) {
+                    return const CheckoutPage();
+                  }));
+                } else {
+                  Navigator.push(context, MaterialPageRoute(builder: (context) {
+                    return const AuthPage();
+                  }));
+                }
+              },
               style: ElevatedButton.styleFrom(
                   //lebarnya tak terbatas
                   minimumSize: const Size(double.infinity, 45),
@@ -543,7 +561,13 @@ class _CartPageState extends State<CartPage> {
                                   : GlobalVariables.unselectedNavBarColor,
                               width: bottomBarBorderWidth))),
                   child: InkWell(
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const AccountPage()),
+                      );
+                    },
                     child: const Icon(
                       Icons.person_outline,
                       size: 24.0,

@@ -22,4 +22,18 @@ class ProductRemoteDataSource {
       return const Left("Proses anda gagal");
     }
   }
+
+  //pencarian berdasrkan nama produk
+  Future<Either<String, ListProductResponseModel>> search(String name) async {
+    final response = await http.get(Uri.parse(
+        "${GlobalVariables.baseUrl}/products?filters[name][\$contains]=$name"));
+
+    //fromjson = utk ambil semua data
+    //fromrawjson = utk ambil semua data / satu data saja
+    if (response.statusCode == 200) {
+      return Right(ListProductResponseModel.fromRawJson(response.body));
+    } else {
+      return const Left("Proses pencarian gagal"); //left = gaga;
+    }
+  }
 }
